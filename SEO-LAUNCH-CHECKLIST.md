@@ -8,7 +8,7 @@ funnel work (Phases 1–3) is already done in code.
 
 Each is flagged in-code with a `PlaceholderNote` or `// PLACEHOLDER` comment.
 
-- [ ] **Discord invite** — set a permanent invite in `src/lib/content.ts` (`site.discord`). Currently `discord.gg/REPLACE-permanent-invite`. Every Join CTA depends on it.
+- [x] **Discord invite** — set in `src/lib/content.ts` (`site.discord`) as a fallback, and in the hub-served socials (the value every Join CTA actually uses). Updated 2026-08-05.
 - [ ] **LinkedIn URL** — `site.linkedin` in `src/lib/content.ts`. Until set, it's filtered out of the Organization `sameAs` schema automatically.
 - [ ] **Committee** — replace the 8 placeholder names + duck avatars in `team[]` (`content.ts`) with real names, roles and headshots (`src/app/about/page.tsx`).
 - [ ] **Projects** — swap the 4 sample projects in `projects[]` for real member projects: title, one-liner, builder, stack, screenshot (`.webp`, <100KB, descriptive alt), and real repo/live links.

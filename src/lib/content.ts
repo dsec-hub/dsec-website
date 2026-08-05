@@ -54,7 +54,7 @@ export const site = {
   longName: "Deakin Software Engineering Club",
   tagline: "We build real software.",
   email: "admin@dsec.club",
-  discord: "https://discord.gg/REPLACE-permanent-invite", // PLACEHOLDER: permanent Discord invite
+  discord: "https://discord.gg/5dyzUvAfwE", // fallback only — the hub-served socials.discord wins
   dusaMembership:
     "https://www.dusa.org.au/clubs/deakin-software-engineering-club-dsec", // buy membership via DUSA
   github: "https://github.com/dsec-hub",
