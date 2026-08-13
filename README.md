@@ -9,13 +9,59 @@ mascot. Near-black violet base, neon arcade accents, chunky cream offset shadows
 3D pop, jagged pixel-skyline section seams, extruded pixel headlines, and
 hand-generated isometric 3D pixel illustrations.
 
+This is a standalone repository. It was split out of the `dsec` monorepo and no
+longer depends on that checkout.
+
 ## Run it
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build (all pages are static)
+cp .env.example .env.local   # optional for a first run — see Environment below
+npm run dev                  # http://localhost:3000
+npm run build                # production build (needs no environment)
+npm run typecheck            # tsc --noEmit
+npm run lint                 # eslint
 ```
+
+The dev server is pinned to **3000** so the four front-ends (website 3000,
+portal 3001, hub 3002, games 3003) can all run at once.
+
+CI runs typecheck, lint and build on every push to `main` and every PR
+(`.github/workflows/ci.yml`).
+
+## What it depends on
+
+Nothing is required to build or run the site locally — every external feed
+degrades to a placeholder when its variable is unset.
+
+| Dependency | Why | Required? |
+|---|---|---|
+| **dsec-api** | Live projects/events feed via the public `/website/*` endpoints | No — falls back to "coming soon" placeholders |
+| **Resend** | Sends the sponsor and contact form emails | Yes, for the forms to work |
+| **Cloudflare Turnstile** | Captcha on those forms | No, but see the warning below |
+| **Notion** | Mirrors sponsorship leads into a database | No — the sync no-ops if unset |
+| **dsec-hub** | Calls `POST /api/revalidate` to drop a cached feed after a content edit | No — feeds self-heal within 24h |
+
+> ⚠️ Turnstile **fails open**: with `TURNSTILE_SECRET_KEY` unset, server-side
+> verification returns true for every submission and the captcha is effectively
+> off. The honeypot and content heuristics still apply. Set it in production.
+
+## Environment
+
+Copy `.env.example` → `.env.local`; it documents every variable with a comment.
+In summary:
+
+| Var | Purpose |
+|---|---|
+| `DSEC_API_URL` | `dsec-api` base URL for the live projects/events feed |
+| `NEXT_PUBLIC_APP_URL` | Where the header "Sign in" button points |
+| `REVALIDATE_SECRET` | Shared secret for `POST /api/revalidate`; must match `dsec-hub` |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `SPONSOR_INBOX`, `CONTACT_INBOX` | Form email delivery |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Captcha |
+| `NOTION_TOKEN`, `NOTION_SPONSOR_DB_ID` | Sponsorship lead sync |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Enquiry pings |
+| `NEXT_PUBLIC_GSC_VERIFICATION` | Google Search Console verification tag |
+| `OPENAI_API_KEY` | Only used by the Python image pipeline in `scripts/` |
 
 ## Pages
 
@@ -31,9 +77,10 @@ npm run build    # production build (all pages are static)
 | `/scan` | in-person | QR board for event screens (site / IG / Discord / join) |
 | `/heroes` | **design exploration** — all 6 hero treatments |
 
-The two funnels (sponsors vs students) never share a CTA on the same page, per the
-brief. Replace anything flagged `PLACEHOLDER` (and the `⚑` notes in the UI) with
-real club content before launch — see the §7 checklist in the original brief.
+The two funnels (sponsors vs students) never share a CTA on the same page. Replace
+anything flagged `PLACEHOLDER` (and the `⚑` notes in the UI) with real club
+content before launch — the flags live in `src/lib/content.ts`, and
+[`SEO-LAUNCH-CHECKLIST.md`](./SEO-LAUNCH-CHECKLIST.md) tracks the rest.
 
 ## Design system
 
