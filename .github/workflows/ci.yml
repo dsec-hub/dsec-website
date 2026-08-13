@@ -1,0 +1,46 @@
+# Typecheck, lint and build on every push to main and every PR.
+#
+# This repo was split out of a monorepo and had no CI, so nothing caught a broken
+# build before it reached production. This is the cheap floor: it will not catch
+# logic bugs, but "main does not compile" can no longer merge unnoticed.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch makes an in-flight run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: typecheck / lint / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Vercel's current default major. package.json "engines" sets the floor
+          # (>=20.9.0); this pins what CI actually runs on.
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      # This app needs no environment to build: every external feed degrades to a
+      # placeholder when its variable is unset.
+      - run: npm run build
