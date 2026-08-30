@@ -73,17 +73,30 @@ function QrModal({
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // Lock background scroll while open.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 backdrop-blur-sm"
-      onClick={onClose}
-      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
+      aria-modal="true"
       aria-label={`QR code for ${card.target.label}`}
     >
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-ink/70 backdrop-blur-sm"
+      />
       <div
-        className="pixel-card flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        className="pixel-card relative z-10 flex flex-col"
         style={{ maxWidth: "min(90vw, 380px)" }}
       >
         <div
