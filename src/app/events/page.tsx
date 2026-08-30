@@ -56,10 +56,11 @@ export default async function EventsPage() {
         </div>
       </section>
 
-      {/* Upcoming first for students, with a clear register CTA. Live from the
-          API feed; in production an empty feed shows the ComingSoon state
-          (placeholders are dev-only — see lib/api.ts). */}
-      {upcoming.length > 0 && showContent && (
+      {/* Three states, exactly one renders: (1) upcoming events, (2) feed has
+          content but nothing upcoming — the normal off-season state, (3) empty/
+          unreachable feed. `upcoming.length > 0` already implies `showContent`,
+          so the old `&& showContent` on the first branch was redundant. */}
+      {upcoming.length > 0 ? (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <SectionHeading eyebrow="Upcoming" title="Coming up. Grab a spot.">
             Free for club members, paid entry for non-members. Register and
@@ -71,9 +72,19 @@ export default async function EventsPage() {
             ))}
           </div>
         </section>
-      )}
-
-      {!showContent && (
+      ) : showContent ? (
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <ComingSoon
+            label="between events"
+            title="Nothing scheduled right now."
+            duck="duck-rocket"
+          >
+            The next one gets announced on Discord first — join us there and you
+            will hear about it before it goes up here. New members are welcome any
+            time via <Link href="/join" className="font-bold text-blue hover:underline">the join page</Link>.
+          </ComingSoon>
+        </section>
+      ) : (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <ComingSoon
             label="updating soon"
