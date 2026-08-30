@@ -276,9 +276,12 @@ export type Tier = {
 };
 
 /**
- * PLACEHOLDER + OPEN DECISION (§7): tiers currently route to a call rather than
- * naming final prices, pending the prospectus with Ranveer + Sophie. "from $X"
- * values are anchors, not quotes. All sponsorship is invoiced via DUSA + GST.
+ * DEV-ONLY PLACEHOLDER: these "from $X" tiers are a local scaffold so the sponsor
+ * page's package grid renders before the live feed exists. They are NEVER served
+ * in production — getPackages() (lib/api.ts) returns the live sponsor-packages
+ * feed, or an empty list that renders a "pricing on request" state when the feed
+ * is empty/unreachable. The figures here are placeholder anchors, not quotes; the
+ * real pricing lives in the dsec-api feed. All sponsorship is invoiced via DUSA + GST.
  */
 export const tiers: Tier[] = [
   {

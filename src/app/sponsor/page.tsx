@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sponsor DSEC - Reach Deakin Software Talent",
     description:
-      "Brand at events students show up to, plus a direct pipeline to Deakin grads. Packages from $500.",
+      "Brand at events students show up to, plus a direct pipeline to Deakin grads. Flexible packages, pricing on request.",
     url: "/sponsor",
     type: "website",
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sponsor DSEC - Reach Deakin Software Talent",
     description:
-      "Brand at events students show up to, plus a direct pipeline to Deakin grads. Packages from $500.",
+      "Brand at events students show up to, plus a direct pipeline to Deakin grads. Flexible packages, pricing on request.",
   },
 };
 
@@ -174,7 +174,26 @@ export default async function SponsorPage() {
           that fits, share a few details, and we&apos;ll reveal pricing instantly.
           Then book a call to talk it through.
         </SectionHeading>
-        <SponsorTiers tiers={tiers} />
+        {tiers.length > 0 ? (
+          <SponsorTiers tiers={tiers} />
+        ) : (
+          /* No live packages yet: never publish placeholder "from $X" figures
+             (COL-WEB-04). Show a pricing-on-request panel so the #packages anchor
+             and the "See the packages" hero button still land on real content. */
+          <div className="pixel-card mt-8 flex flex-col items-center gap-4 p-8 text-center sm:p-12">
+            <PixelDuck name="duck-mascot" alt="" size={140} bob />
+            <span className="pixel-tag !bg-yellow text-ink">● pricing on request</span>
+            <h3 className="font-display text-2xl font-bold text-balance sm:text-3xl">
+              Tailored packages, priced to fit.
+            </h3>
+            <p className="max-w-md text-paper/75 text-balance">
+              We build each sponsorship around what you&apos;re after rather than
+              a fixed menu. Book a quick call and we&apos;ll walk you through the
+              options and what they cost.
+            </p>
+            <BookMeetingButton className="btn btn-pink" label="Book a call" />
+          </div>
+        )}
       </section>
 
       {/* 4 - SINGLE PRIMARY CTA: the enquiry form, proof restated beside it */}

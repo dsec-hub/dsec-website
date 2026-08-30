@@ -393,12 +393,13 @@ async function getEventFromApi(slug: string): Promise<ClubEvent | null> {
  * the card + page layout is visible before any real content is entered. As soon
  * as the API returns rows, those take over automatically (it's checked first).
  *
- * IMPORTANT: the project/event placeholders are *fake demo data* (DuckType,
- * "Ship It Night"). They're a dev-only scaffold so the layout renders before the
- * feed exists — never shown in production, where an empty/unreachable feed falls
- * through to each page's real "coming soon" empty-state instead. (Team + sponsor
- * packages are excluded below: their placeholders are the club's real roster and
- * pricing, so they stay as genuine fallbacks regardless of environment.)
+ * IMPORTANT: the project/event/package placeholders are *fake demo data*
+ * (DuckType, "Ship It Night", the "from $X" tiers). They're a dev-only scaffold
+ * so the layout renders before the feed exists — never shown in production, where
+ * an empty/unreachable feed falls through to each page's real "coming soon" /
+ * "pricing on request" empty-state instead. (The TEAM roster is the exception:
+ * its placeholders are the club's real committee, so they stay a genuine fallback
+ * in every environment — see getTeam. COR-07 covers the roster.)
  * ------------------------------------------------------------------------- */
 
 const SHOW_DEMO_PLACEHOLDERS = process.env.NODE_ENV !== "production";
@@ -478,10 +479,17 @@ async function getPackagesFromApi(): Promise<Tier[] | null> {
   }));
 }
 
-/** Live packages when the API has them; falls back to the hardcoded tiers. */
+/**
+ * Live sponsor packages when the API has them. In dev, the hardcoded tiers make
+ * the package grid workable before the feed exists; in production an empty/
+ * unreachable feed returns [] so the sponsor page shows its "pricing on request"
+ * state instead of publishing placeholder "from $X" figures the club would then
+ * have to honour (COL-WEB-04). Gated exactly like getProjects/getEvents.
+ */
 export async function getPackages(): Promise<Tier[]> {
   const rows = await getPackagesFromApi();
-  return rows ?? placeholderTiers;
+  if (rows) return rows;
+  return SHOW_DEMO_PLACEHOLDERS ? placeholderTiers : [];
 }
 
 // ---------------------------------------------------------------------------
