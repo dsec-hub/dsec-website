@@ -114,13 +114,28 @@ Six hero treatments live in `src/components/heroes.tsx` (`HeroConsole`, `HeroBoo
 Illustrations are generated, then the black background is removed in Python and the
 result is compressed to `.webp`. Final assets live in `public/pixel/`.
 
+The scripts need their own Python environment (it is gitignored — create it once):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r scripts/requirements.txt
+```
+
 ```bash
 # 1. generate raw renders on a pure-black background (OpenAI Images API, gpt-image-1)
+#    ⚠️ This SPENDS the club's OpenAI credits. Needs OPENAI_API_KEY in .env.local.
 .venv/bin/python scripts/generate.py            # all, or pass keys: duck-laptop hero-desk
 
 # 2. flood-fill the black bg -> crop -> hard alpha -> lossless webp
+#    Offline and free — safe to run and re-run.
 .venv/bin/python scripts/process.py
 ```
+
+Other scripts in `scripts/` (not part of the two-step pipeline above):
+- `chroma_key_duck.py` — offline; keys a flat magenta chroma background off the `duck-laptop` sprite.
+- `regen_green.py`     — ⚠️ calls the OpenAI API; regenerates duck sprites on a green screen and keys them out.
+- `hero-party.py`      — ⚠️ calls the OpenAI API; generates + keys the homepage hero party scene.
 
 `scripts/generate.py` reads `OPENAI_API_KEY` from `.env.local` (gitignored).
 `scripts/process.py` uses an **edge-seeded flood fill** so the black *background* is
@@ -146,5 +161,5 @@ src/
   lib/content.ts  # all copy + data + PLACEHOLDER flags in one place
 scripts/          # generate.py + process.py (image pipeline)
 public/pixel/     # final .webp illustrations
-raw-images/       # raw black-bg PNGs (intermediate)
+raw-images/       # raw black-bg PNGs (intermediate — generated, gitignored)
 ```
