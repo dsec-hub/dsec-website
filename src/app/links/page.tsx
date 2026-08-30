@@ -61,7 +61,9 @@ const SITE_ORIGIN = "https://dsec.club";
  */
 function safeHref(value: string): string {
   const v = value.trim();
-  if (v.startsWith("/")) return v;
+  // A leading `//` (or `/\`, which browsers normalise to `//`) is NOT an in-app
+  // path — it is a protocol-relative URL pointing at another origin.
+  if (v.startsWith("/") && !v.startsWith("//") && !v.startsWith("/\\")) return v;
   try {
     const { protocol } = new URL(v);
     if (["http:", "https:", "mailto:", "tel:"].includes(protocol)) return v;

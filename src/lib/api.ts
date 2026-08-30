@@ -247,10 +247,10 @@ function formatEventDate(e: ApiEvent): string {
   return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function mapProject(p: ApiProject, i: number): Project {
+function mapProject(p: ApiProject & { slug: string }, i: number): Project {
   const { bannerUrl, posterUrl, gallery } = splitMedia(p.media);
   return {
-    slug: p.slug ?? `project-${i}`,
+    slug: p.slug,
     title: p.title,
     blurb: p.summary ?? p.description ?? "",
     stack: p.tags ?? [],
@@ -359,12 +359,19 @@ function mapFlagshipTheme(t: string | null | undefined): ClubEvent["flagshipThem
 async function getProjectsFromApi(): Promise<Project[] | null> {
   const rows = await fetchJson<ApiProject[]>("/website/projects", ["projects"]);
   if (!rows) return null;
-  return rows.map(mapProject);
+  // Belt-and-braces: a slugless project can't have a resolvable detail page, so
+  // drop it here the way `ledProjects` does — even if an older API deployment
+  // (before the /website/projects slug filter) still serves one. This keeps
+  // Project.slug an honest `string` with no positional fabrication.
+  return rows
+    .filter((p): p is ApiProject & { slug: string } => !!p.slug)
+    .map(mapProject);
 }
 
 async function getProjectFromApi(slug: string): Promise<Project | null> {
   const row = await fetchJson<ApiProject>(`/website/projects/${encodeURIComponent(slug)}`, ["projects"]);
-  return row ? mapProject(row, 0) : null;
+  if (!row?.slug) return null;
+  return mapProject({ ...row, slug: row.slug }, 0);
 }
 
 async function getEventsFromApi(): Promise<ClubEvent[] | null> {
@@ -386,12 +393,13 @@ async function getEventFromApi(slug: string): Promise<ClubEvent | null> {
  * the card + page layout is visible before any real content is entered. As soon
  * as the API returns rows, those take over automatically (it's checked first).
  *
- * IMPORTANT: the project/event placeholders are *fake demo data* (DuckType,
- * "Ship It Night"). They're a dev-only scaffold so the layout renders before the
- * feed exists — never shown in production, where an empty/unreachable feed falls
- * through to each page's real "coming soon" empty-state instead. (Team + sponsor
- * packages are excluded below: their placeholders are the club's real roster and
- * pricing, so they stay as genuine fallbacks regardless of environment.)
+ * IMPORTANT: the project/event/package placeholders are *fake demo data*
+ * (DuckType, "Ship It Night", the "from $X" tiers). They're a dev-only scaffold
+ * so the layout renders before the feed exists — never shown in production, where
+ * an empty/unreachable feed falls through to each page's real "coming soon" /
+ * "pricing on request" empty-state instead. (The TEAM roster is the exception:
+ * its placeholders are the club's real committee, so they stay a genuine fallback
+ * in every environment — see getTeam. COR-07 covers the roster.)
  * ------------------------------------------------------------------------- */
 
 const SHOW_DEMO_PLACEHOLDERS = process.env.NODE_ENV !== "production";
@@ -471,10 +479,17 @@ async function getPackagesFromApi(): Promise<Tier[] | null> {
   }));
 }
 
-/** Live packages when the API has them; falls back to the hardcoded tiers. */
+/**
+ * Live sponsor packages when the API has them. In dev, the hardcoded tiers make
+ * the package grid workable before the feed exists; in production an empty/
+ * unreachable feed returns [] so the sponsor page shows its "pricing on request"
+ * state instead of publishing placeholder "from $X" figures the club would then
+ * have to honour (COL-WEB-04). Gated exactly like getProjects/getEvents.
+ */
 export async function getPackages(): Promise<Tier[]> {
   const rows = await getPackagesFromApi();
-  return rows ?? placeholderTiers;
+  if (rows) return rows;
+  return SHOW_DEMO_PLACEHOLDERS ? placeholderTiers : [];
 }
 
 // ---------------------------------------------------------------------------

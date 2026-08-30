@@ -58,10 +58,8 @@ function eventSchema(e: ClubEvent) {
     "@type": "Event",
     name: e.title,
     startDate: e.isoDate,
-    eventStatus:
-      e.status === "upcoming"
-        ? "https://schema.org/EventScheduled"
-        : "https://schema.org/EventScheduled",
+    // Only upcoming events are emitted (see eventsSchema), so this is always true.
+    eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     description: e.blurb,
     image: `${BASE}${e.image}`,
@@ -83,7 +81,11 @@ function eventSchema(e: ClubEvent) {
   };
 }
 
-/** Event schema for every event that has a confirmed isoDate (others skipped). */
+/**
+ * Event schema for UPCOMING events that have a confirmed isoDate. Past events are
+ * skipped: schema.org has no honest "this already happened" status for a rich
+ * result, and publishing them as EventScheduled tells Google something false.
+ */
 export function eventsSchema() {
-  return events.filter((e) => e.isoDate).map(eventSchema);
+  return events.filter((e) => e.isoDate && e.status === "upcoming").map(eventSchema);
 }

@@ -3,9 +3,10 @@
  *
  * Deliverability-first: table layout, inline styles, no web fonts. Brand assets
  * are PNGs (not SVG/WebP, which Gmail and others won't render) served from the
- * site over absolute https URLs. Every dynamic value MUST be passed through
- * `escapeHtml` (telegram.ts) by the caller before it reaches here. These
- * helpers do not escape.
+ * site over absolute https URLs. These helpers escape every dynamic value they
+ * are given (see `escapeHtml` from telegram.ts, and `escapeAttr` below for
+ * attribute contexts). Callers MUST pass raw, unescaped text — pre-escaping
+ * produces `&amp;lt;` in the delivered email.
  */
 
 import { escapeHtml } from "@/lib/telegram";
@@ -24,6 +25,30 @@ const MUTED = "#9c97a8"; // secondary text
 const BORDER = "#242424"; // hairlines
 
 export type Field = { label: string; value: string };
+
+/** Escape a value for use inside a double-quoted HTML attribute. Stricter than
+ *  telegram.ts's escapeHtml, which is tuned for Telegram's HTML parse mode and
+ *  deliberately leaves quotes alone. */
+function escapeAttr(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** An http(s) or mailto URL, or "#" — so a future dynamic CTA can never emit a
+ *  `javascript:` link into an email client that follows it. */
+function safeLinkUrl(raw: string): string {
+  try {
+    const { protocol } = new URL(raw);
+    if (["http:", "https:", "mailto:"].includes(protocol)) return raw;
+  } catch {
+    /* not absolute → fall through */
+  }
+  return "#";
+}
 
 /** Build the plain-text body shared with the HTML version (multipart fallback). */
 export function renderText(rows: Field[], message?: string): string {
@@ -63,7 +88,7 @@ function messageBlock(message: string): string {
 function ctaBlock(label: string, url: string): string {
   return `
     <tr><td colspan="2" style="padding-top:22px;">
-      <a href="${escapeHtml(url)}" style="display:inline-block;background:${PINK};color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 24px;border-radius:8px;">${escapeHtml(
+      <a href="${escapeAttr(safeLinkUrl(url))}" style="display:inline-block;background:${PINK};color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 24px;border-radius:8px;">${escapeHtml(
         label,
       )}</a>
     </td></tr>`;
