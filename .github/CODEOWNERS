@@ -1,0 +1,19 @@
+# Code owners for dsec-website (dsec.club marketing site).
+# Owners are auto-requested for review on matching paths. Last match wins,
+# so the owner-only overrides below sit *after* the default.
+#
+# @dsec-hub/dsec-leads  — trusted reviewers (default)
+# @Clupai8o0            — maintainer; the only reviewer for the API-boundary
+#                         and anything that could leak fixtures or secrets.
+
+# Default: any lead may review. Showcase UI (src/app/projects/**,
+# src/lib/showcase-fixtures.json) intentionally falls here — open to any lead.
+*                               @dsec-hub/dsec-leads
+
+# The live-feed boundary: fixture gating, prod detection, and what data the
+# public site trusts all live here. Maintainer-only.
+/src/lib/api.ts                 @Clupai8o0
+
+# Governance and CI config.
+/.github/                       @Clupai8o0
+/CONTRIBUTING.md                @Clupai8o0
