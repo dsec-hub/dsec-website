@@ -247,10 +247,10 @@ function formatEventDate(e: ApiEvent): string {
   return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function mapProject(p: ApiProject, i: number): Project {
+function mapProject(p: ApiProject & { slug: string }, i: number): Project {
   const { bannerUrl, posterUrl, gallery } = splitMedia(p.media);
   return {
-    slug: p.slug ?? `project-${i}`,
+    slug: p.slug,
     title: p.title,
     blurb: p.summary ?? p.description ?? "",
     stack: p.tags ?? [],
@@ -359,12 +359,19 @@ function mapFlagshipTheme(t: string | null | undefined): ClubEvent["flagshipThem
 async function getProjectsFromApi(): Promise<Project[] | null> {
   const rows = await fetchJson<ApiProject[]>("/website/projects", ["projects"]);
   if (!rows) return null;
-  return rows.map(mapProject);
+  // Belt-and-braces: a slugless project can't have a resolvable detail page, so
+  // drop it here the way `ledProjects` does — even if an older API deployment
+  // (before the /website/projects slug filter) still serves one. This keeps
+  // Project.slug an honest `string` with no positional fabrication.
+  return rows
+    .filter((p): p is ApiProject & { slug: string } => !!p.slug)
+    .map(mapProject);
 }
 
 async function getProjectFromApi(slug: string): Promise<Project | null> {
   const row = await fetchJson<ApiProject>(`/website/projects/${encodeURIComponent(slug)}`, ["projects"]);
-  return row ? mapProject(row, 0) : null;
+  if (!row?.slug) return null;
+  return mapProject({ ...row, slug: row.slug }, 0);
 }
 
 async function getEventsFromApi(): Promise<ClubEvent[] | null> {
