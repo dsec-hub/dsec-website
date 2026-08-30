@@ -26,6 +26,11 @@ npm run lint                 # eslint
 The dev server is pinned to **3000** so the four front-ends (website 3000,
 portal 3001, hub 3002, games 3003) can all run at once.
 
+Run `npm run dev` with **no `DSEC_API_URL` set** and `/projects` renders a full
+**fixture showcase** (`src/lib/showcase-fixtures.json`) so you can build showcase
+UI with zero credentials and no database. Set `DSEC_API_URL` to use the live feed
+instead; the fixtures never appear in a production build.
+
 CI runs typecheck, lint and build on every push to `main` and every PR
 (`.github/workflows/ci.yml`).
 

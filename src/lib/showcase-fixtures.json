@@ -1,0 +1,165 @@
+[
+  {
+    "slug": "portknock",
+    "title": "PortKnock",
+    "summary": "A tiny port-knocking daemon that hides SSH behind a secret sequence.",
+    "description": "PortKnock is a single-binary daemon that keeps a firewall port closed until a client sends a pre-agreed sequence of connection attempts, then opens it just for that source IP for a short window. It was built to learn how netfilter and raw sockets actually work rather than to replace a real bastion host. The write-up covers why knock sequences are obscurity not security, how replay is mitigated with a rotating time-based secret, and what an attacker sniffing the wire can still recover. Ships with a systemd unit, a client CLI, and a test harness that fuzzes malformed packets.",
+    "tags": ["Rust", "Linux", "Networking"],
+    "status": "Showcased",
+    "category": "Security tool",
+    "repo": "https://github.com/dsec-demo/portknock",
+    "demo": null,
+    "image": "/pixel/hero-desk.webp",
+    "download": null,
+    "media": [
+      {
+        "role": "banner",
+        "webp": "/flagship/hero-blueprint.webp",
+        "png": "/flagship/hero-blueprint.webp",
+        "alt": "PortKnock architecture diagram",
+        "width": 1200,
+        "height": 630
+      }
+    ],
+    "lead": { "name": "Priya Nadella", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "ctf-forge",
+    "title": "CTF Forge",
+    "summary": "Author, containerise, and host capture-the-flag challenges from one dashboard.",
+    "description": "CTF Forge lets a committee run an internal capture-the-flag event without hand-rolling Docker files for every challenge. Authors describe a challenge in a small YAML spec — category, points, flag format, and the files to serve — and Forge builds an isolated container per team on demand, rotates per-team flags to kill flag-sharing, and streams a live scoreboard. Built for the club's beginner CTF nights, it deliberately sandboxes each challenge on its own network namespace so a pwnable can't reach the scoring API. The repo includes three example challenges (web, crypto, forensics) and a scoring model that rewards early solves.",
+    "tags": ["Next.js", "Postgres", "Docker"],
+    "status": "Active",
+    "category": "Web app",
+    "repo": "https://github.com/dsec-demo/ctf-forge",
+    "demo": "https://ctf-forge.example.dev",
+    "image": "/pixel/hero-iso-island.webp",
+    "download": null,
+    "media": [
+      {
+        "role": "banner",
+        "webp": "/flagship/hero-arena.webp",
+        "png": "/flagship/hero-arena.webp",
+        "alt": "CTF Forge scoreboard",
+        "width": 1200,
+        "height": 630
+      },
+      {
+        "role": "image",
+        "webp": "/pixel/hero-desk.webp",
+        "png": "/pixel/hero-desk.webp",
+        "alt": "Challenge editor",
+        "width": 800,
+        "height": 600
+      }
+    ],
+    "lead": { "name": "Marcus Lowe", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "duckpass",
+    "title": "DuckPass",
+    "summary": "A browser extension that coaches you to a stronger password as you type.",
+    "description": "DuckPass is a WebExtension that scores a password field live and, instead of just showing a red bar, explains what would actually make it harder to crack — length beats symbols, a passphrase beats l33t-speak, and reuse is the real killer. Everything runs locally: no keystroke ever leaves the browser, and the entropy estimate uses a small on-device wordlist rather than an API. It was the club's intro-to-extensions project, so the code is heavily commented and the README walks through the manifest v3 permissions model line by line. Works in Chrome and Firefox.",
+    "tags": ["TypeScript", "WebExtensions", "Security"],
+    "status": "Completed",
+    "category": "Browser extension",
+    "repo": "https://github.com/dsec-demo/duckpass",
+    "demo": null,
+    "image": "/pixel/duck-mail.webp",
+    "download": null,
+    "media": [],
+    "lead": { "name": "Ada Fernsby", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "sig-hunt",
+    "title": "SigHunt",
+    "summary": "Cluster unknown malware samples by behaviour to surface new families.",
+    "description": "SigHunt takes a folder of sandbox reports and groups samples that behave alike — same registry keys touched, same network beacon shape, same file-drop pattern — so an analyst can triage a bucket of unknowns without a signature for each one. It uses TF-IDF over the API-call traces and agglomerative clustering, then renders a dendrogram you can cut at any threshold. Built as a machine-learning reading-group project, the notebook explains why clustering is honest triage and classification here would be over-claiming. Ships with a small labelled evaluation set and the confusion matrix that comes out of it.",
+    "tags": ["Python", "scikit-learn", "Jupyter"],
+    "status": "Active",
+    "category": "Machine learning",
+    "repo": "https://github.com/dsec-demo/sig-hunt",
+    "demo": null,
+    "image": "/pixel/duck-laptop.webp",
+    "download": null,
+    "media": [],
+    "lead": { "name": "Wei Tanaka", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "arcade-siege",
+    "title": "Arcade Siege",
+    "summary": "A pixel-art tower defense where the towers are firewall rules.",
+    "description": "Arcade Siege is a browser tower-defense game with a security-club joke baked in: your towers are firewall rules, the creeps are packets, and a boss wave is a slow-loris that only a rate-limit tower can stop. It started as the club's Godot game-jam entry and grew a level editor, a wave designer, and a small original chiptune soundtrack. The point of shipping it in the showcase is that it runs entirely in the browser sandbox — the safest possible thing to host — which is exactly the kind of `web` release the showcase recommends first. Playable on desktop and mobile.",
+    "tags": ["Godot", "GDScript", "WebGL"],
+    "status": "Showcased",
+    "category": "Game",
+    "repo": "https://github.com/dsec-demo/arcade-siege",
+    "demo": "https://arcade-siege.example.dev",
+    "image": "/pixel/hero-iso-arcade.webp",
+    "download": null,
+    "media": [
+      {
+        "role": "banner",
+        "webp": "/pixel/hero-banner.webp",
+        "png": "/pixel/hero-banner.webp",
+        "alt": "Arcade Siege gameplay",
+        "width": 1200,
+        "height": 630
+      },
+      {
+        "role": "image",
+        "webp": "/pixel/duck-trophy.webp",
+        "png": "/pixel/duck-trophy.webp",
+        "alt": "Victory screen",
+        "width": 800,
+        "height": 600
+      }
+    ],
+    "lead": { "name": "Sofia Marković", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "packet-pigeon",
+    "title": "Packet Pigeon",
+    "summary": "A pcap pretty-printer that turns a capture into a readable story.",
+    "description": "Packet Pigeon reads a pcap and prints a plain-English timeline of a connection — the handshake, the TLS hello with its SNI, the requests, the resets — so a beginner can see what Wireshark is showing without learning every column first. It's a teaching tool, not a replacement for tshark, and the README says so. Built in Go for a single static binary, it decodes the common layers, redacts payloads by default, and can emit either coloured terminal output or Markdown for a report. The test suite runs against a handful of checked-in captures so behaviour is reproducible.",
+    "tags": ["Go", "libpcap", "CLI"],
+    "status": "Completed",
+    "category": "CLI tool",
+    "repo": "https://github.com/dsec-demo/packet-pigeon",
+    "demo": null,
+    "image": "/pixel/duck-rocket.webp",
+    "download": null,
+    "media": [],
+    "lead": { "name": "Dilnoza Karimova", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "roster-radar",
+    "title": "Roster Radar",
+    "summary": "A phone app for checking members in at the door of an event.",
+    "description": "Roster Radar is the app a committee member holds at the door: scan a member's QR, see their name and whether their DUSA membership is current, and tap to check them in — all against the club's own roster, never a third-party service. It caches the roster on device so the queue keeps moving when the venue Wi-Fi dies, then syncs check-ins back when it reconnects. Built with Expo so one codebase runs on both platforms, it was the club's intro-to-mobile project and leans hard on the offline-first pattern. No attendee data is stored beyond the event.",
+    "tags": ["React Native", "Expo", "TypeScript"],
+    "status": "Active",
+    "category": "Mobile app",
+    "repo": "https://github.com/dsec-demo/roster-radar",
+    "demo": null,
+    "image": "/pixel/duck-coffee.webp",
+    "download": null,
+    "media": [],
+    "lead": { "name": "Theo Abara", "role": "Project lead", "photo": null }
+  },
+  {
+    "slug": "byte-badge",
+    "title": "Byte Badge",
+    "summary": "An open-hardware conference badge that boots into a CTF.",
+    "description": "Byte Badge is a DIY electronic conference badge built around an ESP32 that boots into a tiny hardware-hacking CTF — solder the headers, flash the firmware, and the first challenge is figuring out the serial baud rate. The KiCad board files, a bill of materials that comes in under fifteen dollars, and the firmware are all open so a member can order their own from any fab. It's an early-stage idea rather than a finished run: the schematic is done and one prototype exists, and the repo is looking for contributors to design the next three challenges. Reached through its GitHub repo — there is no binary to download here.",
+    "tags": ["C", "ESP32", "KiCad"],
+    "status": "Idea",
+    "category": "Hardware",
+    "repo": "https://github.com/dsec-demo/byte-badge",
+    "demo": null,
+    "image": "/pixel/icon-controller.webp",
+    "download": null,
+    "media": [],
+    "lead": { "name": "Noor Haddad", "role": "Project lead", "photo": null }
+  }
+]

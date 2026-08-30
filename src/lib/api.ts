@@ -40,6 +40,7 @@ type ScanCardAccent = "blue" | "pink" | "yellow" | "mint";
 import type { DuckName } from "@/components/pixel-duck";
 import { parsePageDoc } from "@/lib/page-blocks";
 import type { CustomPage, NavEntry, PageSummary } from "@/lib/pages";
+import showcaseFixtures from "@/lib/showcase-fixtures.json";
 
 const ACCENTS = ["blue", "pink", "yellow", "mint"] as const;
 const PROJECT_DUCKS: DuckName[] = ["icon-controller", "icon-cursor", "icon-floppy", "icon-star"];
@@ -404,9 +405,41 @@ async function getEventFromApi(slug: string): Promise<ClubEvent | null> {
 
 const SHOW_DEMO_PLACEHOLDERS = process.env.NODE_ENV !== "production";
 
+/**
+ * Checked-in showcase fixtures (SHOW-2). A contributor who clones this repo and
+ * runs `npm run dev` with NO `DSEC_API_URL` gets a full, realistic /projects
+ * showcase to build filter chips and cards against — zero credentials, zero
+ * database. These are obviously-fictional demo projects.
+ *
+ * They are shaped exactly like the live `/website/projects` feed (`ApiProject`)
+ * and go through the SAME `mapProject`, so what a contributor sees is what the
+ * real mapping produces. When `DSEC_API_URL` is set, behaviour is exactly as
+ * before (the fixtures never load).
+ *
+ * NOTE: the trimester-grouping ticket will need a `start_date` on the feed;
+ * when `ApiProject`/`mapProject` gain it, add it to these rows too.
+ */
+const fixtureProjectRows = (showcaseFixtures as ApiProject[]).filter(
+  (p): p is ApiProject & { slug: string } => !!p.slug,
+);
+
+/**
+ * Two INDEPENDENT guards keep fixtures off every deployed site:
+ *  - `NODE_ENV !== "production"` (the repo's existing production signal), and
+ *  - `VERCEL !== "1"` — set on every Vercel build/deploy (preview and production
+ *    alike). dsec.club is served from Vercel, so this alone makes fixtures
+ *    unreachable there even under `NODE_ENV=development npm run build`, which
+ *    Next 16 honours (it only defaults NODE_ENV to production when unset).
+ * Locally both are false, so `npm run dev` shows the fixtures.
+ */
+const ALLOW_FIXTURES = process.env.NODE_ENV !== "production" && process.env.VERCEL !== "1";
+
 export async function getProjects(): Promise<Project[]> {
   const rows = await getProjectsFromApi();
   if (rows && rows.length > 0) return rows;
+  // No live feed. With DSEC_API_URL UNSET in local dev, render the full fixture
+  // showcase; otherwise fall through to the pre-existing dev-only placeholders.
+  if (ALLOW_FIXTURES && apiBase() === null) return fixtureProjectRows.map(mapProject);
   return SHOW_DEMO_PLACEHOLDERS ? placeholderProjects : [];
 }
 
@@ -419,6 +452,10 @@ export async function getEvents(): Promise<ClubEvent[]> {
 export async function getProject(slug: string): Promise<Project | null> {
   const live = await getProjectFromApi(slug);
   if (live) return live;
+  if (ALLOW_FIXTURES && apiBase() === null) {
+    const row = fixtureProjectRows.find((p) => p.slug === slug);
+    return row ? mapProject(row, 0) : null;
+  }
   if (!SHOW_DEMO_PLACEHOLDERS) return null;
   return placeholderProjects.find((p) => p.slug === slug) ?? null;
 }
